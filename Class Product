@@ -1,0 +1,58 @@
+class Product:
+    
+    # Constructor Method
+    def __init__(self, prod_code, prod_name, prod_description,prod_qty, prod_price,prod_location):
+        self._prod_code = prod_code
+        self._prod_name = prod_name
+        self._prod_description = prod_description
+        self._prod_qty = prod_qty
+        self._prod_price = prod_price
+        self._prod_location = prod_location
+
+    # Getters methods
+    def get_prod_code(self):
+        return self._prod_code
+
+    def get_prod_name(self):
+        return self._prod_name
+    
+    def get_prod_description(self):
+        return self._prod_description
+    
+    def get_prod_qty(self):
+        return self._prod_qty
+    
+    def get_prod_price(self):
+        return self._prod_price
+    
+    def get_prod_location(self):
+        return self._prod_location
+
+    # Setters methods
+    def set_prod_code(self,value):
+        self._prod_code = value
+    
+    def set_prod_name(self,value):
+        self._prod_name = value
+    
+    def set_prod_description(self,value):
+        self._prod_description
+    
+    def set_prod_qty(self,value):
+        self._prod_qty = value
+    
+    def set_prod_price(self,value):
+        self._prod_price = value
+    
+    def set_prod_location(self,value):
+        self._prod_location = value
+    
+
+    def display_data(self):
+        print(f"Product Code: {self._prod_code}")
+        print(f"Product Name: {self._prod_name}")
+        print(f"Product Description: {self._prod_description}")
+        print(f"Quantity in stock: {self._prod_qty}")
+        print(f"Product unit price: {self._prod_price}")
+        print(f"Product shelf location: {self._prod_location}")
+    
