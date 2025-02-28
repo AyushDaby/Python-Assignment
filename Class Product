@@ -1,5 +1,10 @@
+from Sales import Sales
+
 class Product:
-    
+    # Text files to be used
+    products_file = "products.txt"
+    stock_file = "stock.txt"
+
     # Constructor Method
     def __init__(self, prod_code, prod_name, prod_description,prod_qty, prod_price,prod_location):
         self._prod_code = prod_code
@@ -56,3 +61,46 @@ class Product:
         print(f"Product unit price: {self._prod_price}")
         print(f"Product shelf location: {self._prod_location}")
     
+    # Method to read the content of the file and store is in a list
+    def read_products(self):
+        products = []
+        try:
+            with open(self.products_file, "r") as inputfile:
+                for line in inputfile:
+                    prod_code, prod_name, prod_description, prod_qty, prod_price, prod_location = line.strip().split(",")
+                    products.append(Product(int(prod_code), prod_name, prod_description, int(prod_qty), float(prod_price), prod_location))
+        except FileNotFoundError:
+            print("Products file not found. Creating a new one.")
+        return products
+    
+    # Method to add a new product to the system
+    def add_product(self):
+        with open(self.products_file, "a") as inputfile:
+            inputfile.write(f"{self.prod_code},{self.prod_name},{self.prod_description},{self.prod_price},{self.prod_qty},{self.prod_location}\n")
+        self.update_stock(self.prod_code, self.prod_qty)
+        print(f"Product '{self.prod_name}' added successfully!")
+
+    # Method to update a product's information
+    def update_product(self, product_code, new_stock):
+        products = self.read_products()
+        updated = False
+        with open(self.products_file, "w") as outputfile:
+            for p in products:
+                if p.prod_code == product_code:
+                    p.prod_qty = new_stock
+                    updated = True
+                outputfile.write(f"{p.prod_code},{p.prod_name},{p.prod_description},{p.prod_price},{p.prod_qty},{p.prod_location}\n")
+        if updated:
+            self.update_stock(product_code, new_stock)
+            print(f"Product code {product_code} updated successfully!")
+        else:
+            print(f"Product code {product_code} not found.")
+
+    # Method to delete a product from the system
+    def delete_product(self, product_id):
+        products = self.read_products()
+        updated_products = [p for p in products if p.prod_code != product_id]
+        with open(self.products_file, "w") as outputfile:
+            for p in updated_products:
+                outputfile.write(f"{p.prod_code},{p.prod_name},{p.prod_description},{p.prod_price},{p.prod_qty},{p.prod_location}\n")
+        print(f"Product code {product_id} deleted successfully!")
