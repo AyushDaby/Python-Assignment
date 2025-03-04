@@ -61,46 +61,53 @@ class Product:
         print(f"Product unit price: {self._prod_price}")
         print(f"Product shelf location: {self._prod_location}")
     
-    # Method to read the content of the file and store is in a list
-    def read_products(self):
-        products = []
-        try:
-            with open(self.products_file, "r") as inputfile:
-                for line in inputfile:
-                    prod_code, prod_name, prod_description, prod_qty, prod_price, prod_location = line.strip().split(",")
-                    products.append(Product(int(prod_code), prod_name, prod_description, int(prod_qty), float(prod_price), prod_location))
-        except FileNotFoundError:
-            print("Products file not found. Creating a new one.")
-        return products
-    
-    # Method to add a new product to the system
     def add_product(self):
+        try:
+            with open(self.products_file, "r") as checkfile:
+                first_line = checkfile.readline()
+                if not first_line.strip():  # If the file is empty or has no headers
+                    with open(self.products_file, "w") as inputfile:
+                        inputfile.write("Code, Name, Description, Quantity, Price, Location\n")
+        except FileNotFoundError:
+            # If the file doesn't exist, create it and add headers
+            with open(self.products_file, "w") as inputfile:
+                inputfile.write("Code, Name, Description, Quantity, Price (Rs), Location\n")
+
         with open(self.products_file, "a") as inputfile:
-            inputfile.write(f"{self.prod_code},{self.prod_name},{self.prod_description},{self.prod_price},{self.prod_qty},{self.prod_location}\n")
-        self.update_stock(self.prod_code, self.prod_qty)
-        print(f"Product '{self.prod_name}' added successfully!")
+            inputfile.write(f"{self._prod_code}, {self._prod_name}, {self._prod_description}, {self._prod_qty}, {self._prod_price}, {self._prod_location}\n")
 
-    # Method to update a product's information
-    def update_product(self, product_code, new_stock):
-        products = self.read_products()
-        updated = False
-        with open(self.products_file, "w") as outputfile:
-            for p in products:
-                if p.prod_code == product_code:
-                    p.prod_qty = new_stock
-                    updated = True
-                outputfile.write(f"{p.prod_code},{p.prod_name},{p.prod_description},{p.prod_price},{p.prod_qty},{p.prod_location}\n")
-        if updated:
-            self.update_stock(product_code, new_stock)
-            print(f"Product code {product_code} updated successfully!")
-        else:
-            print(f"Product code {product_code} not found.")
+        print(f"Product '{self._prod_name}' added successfully!")
+        self.update_stock(self._prod_code, self._prod_qty)
 
-    # Method to delete a product from the system
-    def delete_product(self, product_id):
-        products = self.read_products()
-        updated_products = [p for p in products if p.prod_code != product_id]
-        with open(self.products_file, "w") as outputfile:
-            for p in updated_products:
-                outputfile.write(f"{p.prod_code},{p.prod_name},{p.prod_description},{p.prod_price},{p.prod_qty},{p.prod_location}\n")
-        print(f"Product code {product_id} deleted successfully!")
+    def update_stock(self, product_code, new_qty):
+        updates = []
+        try:
+            # Read existing stock data
+            with open(self.stock_file, "r") as inputfile:
+                for line in inputfile:
+                    code, qty = line.strip().split(",")
+                    if code == product_code:
+                        qty = str(new_qty)  # Update quantity if product code matches
+                    updates.append(f"{code}, {qty}\n")
+
+            # If the product code is not found, add a new entry
+            found = False
+            for line in updates:
+                if product_code in line:
+                    found = True
+                    break
+            if not found:
+                updates.append(f"{product_code},{new_qty}\n")
+
+            # Write updated stock data back to stock.txt
+            with open(self.stock_file, "w") as outputfile:
+                outputfile.writelines(updates)
+
+            print(f"Stock for product code {product_code} updated to {new_qty}.")
+        except FileNotFoundError:
+            # If stock.txt doesn't exist, create it and add the new product
+            with open(self.stock_file, "w") as outputfile:
+                outputfile.write(f"{product_code}, {new_qty}\n")
+            print(f"Stock file created and product code {product_code} added with quantity {new_qty}.")
+        except Exception as e:
+            print(f"An error occurred: {e}")
