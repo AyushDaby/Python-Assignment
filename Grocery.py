@@ -113,10 +113,10 @@ class GroceryManagement(ShoppingCart):
         print("6. Exit")
 
     # Method to view available items
-    def view_items(self):
+   def view_items(self):
         print("\nAvailable Items:")
         for item_name, item in self.items.items():
-            print(item)
+            print(f"{item.get_name()}: Rs {item.get_price():.2f}")
 
     # Method to add items to cart
     def add_items_to_cart(self):
