@@ -51,9 +51,8 @@ class Product:
     
     def set_prod_location(self,value):
         self._prod_location = value
-    
 
-    def display_data(self):
+    def display_product(self):
         print(f"Product Code: {self._prod_code}")
         print(f"Product Name: {self._prod_name}")
         print(f"Product Description: {self._prod_description}")
@@ -61,26 +60,76 @@ class Product:
         print(f"Product unit price: {self._prod_price}")
         print(f"Product shelf location: {self._prod_location}")
     
-    def add_product(self):
-        try:
-            with open(self.products_file, "r") as checkfile:
-                first_line = checkfile.readline()
-                if not first_line.strip():  # If the file is empty or has no headers
-                    with open(self.products_file, "w") as inputfile:
-                        inputfile.write("Code, Name, Description, Quantity, Price, Location\n")
-        except FileNotFoundError:
-            # If the file doesn't exist, create it and add headers
-            with open(self.products_file, "w") as inputfile:
-                inputfile.write("Code, Name, Description, Quantity, Price (Rs), Location\n")
+    def display_stock(self):
+        print(f"Product Code: {self._prod_code}")
+        print(f"Quantity in stock: {self._prod_qty}")
 
+    # Method to read the content of the file and store is in a list
+    def read_products(self):
+        products = []
+        try:
+            with open(self.products_file, "r") as inputfile:
+                for line in inputfile:
+                    # prod_code, prod_name, prod_description, prod_qty, prod_price, prod_location = line.strip().split(",")
+                    # products.append(Product(prod_code, prod_name, prod_description, int(prod_qty), float(prod_price), prod_location))
+                    fields = line.strip().split(",")
+                    products.append(Product(fields[0], fields[1], fields[2], fields[3], fields[4], fields[5]))
+        except FileNotFoundError:
+            print("Products file not found. Creating a new one.")
+        return products
+    
+    def read_stock(self):
+        stock = []
+        try:
+            with open(self.stock_file, "r") as inputfile:
+                for line in inputfile:
+                    fields = line.strip().split(",")
+                    stock.append(Product(fields[0],fields[1]))
+        except FileNotFoundError:
+            print("Stock file not found. Creating a new one.")
+        return stock
+    
+    # Method to add a new product to the system
+    def add_product(self):
         with open(self.products_file, "a") as inputfile:
             inputfile.write(f"{self._prod_code}, {self._prod_name}, {self._prod_description}, {self._prod_qty}, {self._prod_price}, {self._prod_location}\n")
 
         print(f"Product '{self._prod_name}' added successfully!")
         self.update_stock(self._prod_code, self._prod_qty)
 
+    # Method to update a product's information
+    def update_product(self,product_code, category, updated_value):
+        products = self.read_products()
+        updated = False
+
+        with open(self.products_file, "w") as outputfile:
+            for p in products:
+                if p._prod_code == product_code:
+                    if category == "Quantity":
+                        self.update_stock(product_code,updated_value)
+                        p._prod_qty = updated_value
+                    elif category == "Price":
+                        p._prod_price = updated_value
+                    elif category == "Location":
+                        p._prod_location = updated_value
+                    else:
+                        print(f"Invalid category '{category}'. No changed made in the system.")
+                        print("-" * 30)
+                        return
+                    updated = True
+                outputfile.write(f"{p._prod_code},{p._prod_name},{p._prod_description},{p._prod_qty},{p._prod_price},{p._prod_location}\n")
+            
+        if updated:
+            print(f"Product code {product_code}'s {category} updated successfully on the system!")
+            print("-" * 30)
+        else:
+            print(f"Product code {product_code} not found in the system.")
+            print("-" * 30)
+    
+    # Method to update the stock amount of the products
     def update_stock(self, product_code, new_qty):
         updates = []
+        
         try:
             # Read existing stock data
             with open(self.stock_file, "r") as inputfile:
@@ -88,10 +137,11 @@ class Product:
                     code, qty = line.strip().split(",")
                     if code == product_code:
                         qty = str(new_qty)  # Update quantity if product code matches
-                    updates.append(f"{code}, {qty}\n")
+                    updates.append(f"{code},{qty}\n")
 
             # If the product code is not found, add a new entry
             found = False
+            
             for line in updates:
                 if product_code in line:
                     found = True
@@ -104,10 +154,42 @@ class Product:
                 outputfile.writelines(updates)
 
             print(f"Stock for product code {product_code} updated to {new_qty}.")
+        
         except FileNotFoundError:
+            
             # If stock.txt doesn't exist, create it and add the new product
             with open(self.stock_file, "w") as outputfile:
                 outputfile.write(f"{product_code}, {new_qty}\n")
             print(f"Stock file created and product code {product_code} added with quantity {new_qty}.")
+        
         except Exception as e:
             print(f"An error occurred: {e}")
+
+    # Method to delete a product from the system
+    def delete_product(self, product_id):
+        products = self.read_products()
+        updated_products = []
+        
+        for product in products:
+            if product._prod_code != product_id:  # Use the correct loop variable
+                updated_products.append(product)
+        
+        with open(self.products_file, "w") as outputfile:
+            for product in updated_products:
+                # Write the product details in the correct format
+                outputfile.write(f"{product._prod_code},{product._prod_name},{product._prod_description},{product._prod_qty},{product._prod_price},{product._prod_location}\n")
+        
+        print(f"Product code details {product_id} deleted from system successfully!")
+
+        with open("stock.txt", "r") as stockfile:
+            stock_lines = stockfile.readlines()
+            updated_stock = []
+        
+            for line in stock_lines:
+                if not line.startswith(f"{product_id},"):
+                    updated_stock.append(line)
+            
+            with open("stock.txt", "w") as stockfile:
+                stockfile.writelines(updated_stock)
+            
+            print(f"Product stock information {product_id} deleted from system successfully!")
