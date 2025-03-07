@@ -1,9 +1,8 @@
 stock_file = "Assignment/stock.txt"
 product_file = "Assignment/products.txt"
 
-#Creating Superclass Product 
+# Creating Superclass Product
 class Product:
-    
     # Constructor Method
     def __init__(self, product_id, name, price, stock):
         self._product_id = product_id
@@ -27,20 +26,22 @@ class Product:
     # Setters Methods
     def set_stock(self, stock):
         self._stock = stock
-    
-    #Creating an str method to display the details of a Product object
+
+    # Creating an str method to display the details of a Product object
     def __str__(self):
         return f"{self._product_id}: {self._name} (Price: Rs{self._price:.2f}, Stock: {self._stock})"
 
-#Creating Superclass StockManager
+
+# Creating Superclass StockManager
 class StockManager:
-    #Constructor Method
+    # Constructor Method
     def __init__(self):
-       self._products = self.load_products()
-     
-     #Method to append read data from stock and to list 'Products' 
+        self._products = self.load_products()
+
+    # Method to load products from files
     def load_products(self):
-        products = []
+        products = []  # Use a list to store products
+
         try:
             # Open stock.txt to read stock data
             with open(stock_file, 'r') as file:
@@ -50,13 +51,15 @@ class StockManager:
 
             # Open product.txt to read product details
             with open(product_file, 'r') as file:
-                for line in file:
-                    product_id, name, _, _, price, _ = line.strip().split(',')
-                    for product in products:
-                        if product['product_id'] == product_id:
-                            product['name'] = name
-                            product['price'] = float(price)
-                            break
+                product_data = [line.strip().split(',') for line in file]  # Read all product data
+
+            # Update products list with name and price
+            for product in products:
+                for data in product_data:
+                    if product['product_id'] == data[0]:  # Match product_id
+                        product['name'] = data[1]  # Update name
+                        product['price'] = float(data[4])  # Update price
+                        break  # Exit inner loop once the product is found
 
             # Create Product objects
             product_objects = []
@@ -75,26 +78,26 @@ class StockManager:
         except Exception as e:
             print(f"Error loading products: {e}")
             return []
-    
-    #Method to get products
+
+    # Method to get products
     def get_products(self):
         return self._products
 
-    #Method to display product
+    # Method to display product
     def display_products(self):
         print("\nAvailable Products:")
         for product in self._products:
             print(product)
 
-#Creating Subclass Cashier that inherits from Superclass(StockManager)
+
+# Creating Subclass Cashier that inherits from Superclass(StockManager)
 class Cashier(StockManager):
-    
-    #Constructor Method
+    # Constructor Method
     def __init__(self):
         super().__init__()
         self._cart = []
-        
-    #Method to add item(s) and quantity to cart
+
+    # Method to add item(s) and quantity to cart
     def add_to_cart(self, product_id, quantity):
         for product in self._products:
             if product.get_product_id() == product_id:
@@ -106,8 +109,8 @@ class Cashier(StockManager):
                     print(f"Not enough stock for {product.get_name()}.")
                 return
         print("Product not found.")
-    
-    #Method to checkout and display a receipt
+
+    # Method to checkout and display a receipt
     def checkout(self):
         if not self._cart:
             print("Your cart is empty. Add products before checking out.")
