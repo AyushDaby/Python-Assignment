@@ -1,170 +1,169 @@
-# Creating superclass Grocery Item
-class GroceryItem:
-    def __init__(self, name, price):
+stock_file = "Assignment/stock.txt"
+product_file = "Assignment/products.txt"
+
+#Creating Superclass Product 
+class Product:
+    
+    # Constructor Method
+    def __init__(self, product_id, name, price, stock):
+        self._product_id = product_id
         self._name = name
         self._price = price
+        self._stock = stock
 
-    # Getter for name
+    # Getters methods
+    def get_product_id(self):
+        return self._product_id
+
     def get_name(self):
         return self._name
-    
-    # Getter for price
+
     def get_price(self):
         return self._price
+
+    def get_stock(self):
+        return self._stock
+
+    # Setters Methods
+    def set_stock(self, stock):
+        self._stock = stock
     
-
-    # Setter for name
-    def set_name(self, name):
-        self._name = name
-
-    # Setter for price
-    def set_price(self, price):
-        if price > 0:
-            self._price = price
-        else:
-            print("Price must be a positive number.")
-
+    #Creating an str method to display the details of a Product object
     def __str__(self):
-        return f"{self._name}: Rs {self._price:.2f}"
+        return f"{self._product_id}: {self._name} (Price: Rs{self._price:.2f}, Stock: {self._stock})"
 
-
-# Creating second superclass shopping cart
-class ShoppingCart:
+#Creating Superclass StockManager
+class StockManager:
+    #Constructor Method
     def __init__(self):
-        self.cart = []  
+       self._products = self.load_products()
+     
+     #Method to append read data from stock and to list 'Products' 
+    def load_products(self):
+        products = []
+        try:
+            # Open stock.txt to read stock data
+            with open(stock_file, 'r') as file:
+                for line in file:
+                    product_id, stock = line.strip().split(',')
+                    products.append({'product_id': product_id, 'stock': int(stock)})
 
-    # Method to add item
-    def add_item(self, item, quantity):
-        if quantity <= 0:
-            print("Quantity must be a positive number.")
+            # Open product.txt to read product details
+            with open(product_file, 'r') as file:
+                for line in file:
+                    product_id, name, _, _, price, _ = line.strip().split(',')
+                    for product in products:
+                        if product['product_id'] == product_id:
+                            product['name'] = name
+                            product['price'] = float(price)
+                            break
+
+            # Create Product objects
+            product_objects = []
+            for product in products:
+                product_objects.append(Product(
+                    product_id=product['product_id'],
+                    name=product['name'],
+                    price=product['price'],
+                    stock=product['stock']
+                ))
+            return product_objects
+
+        except FileNotFoundError:
+            print("Error: Stock or product file not found.")
+            return []
+        except Exception as e:
+            print(f"Error loading products: {e}")
+            return []
+    
+    #Method to get products
+    def get_products(self):
+        return self._products
+
+    #Method to display product
+    def display_products(self):
+        print("\nAvailable Products:")
+        for product in self._products:
+            print(product)
+
+#Creating Subclass Cashier that inherits from Superclass(StockManager)
+class Cashier(StockManager):
+    
+    #Constructor Method
+    def __init__(self):
+        super().__init__()
+        self._cart = []
+        
+    #Method to add item(s) and quantity to cart
+    def add_to_cart(self, product_id, quantity):
+        for product in self._products:
+            if product.get_product_id() == product_id:
+                if product.get_stock() >= quantity:
+                    product.set_stock(product.get_stock() - quantity)
+                    self._cart.append({'product': product, 'quantity': quantity})
+                    print(f"Added {quantity} units of {product.get_name()} to cart.")
+                else:
+                    print(f"Not enough stock for {product.get_name()}.")
+                return
+        print("Product not found.")
+    
+    #Method to checkout and display a receipt
+    def checkout(self):
+        if not self._cart:
+            print("Your cart is empty. Add products before checking out.")
             return
 
-        # Check if the item already exists in the cart
-        for cart_item in self.cart:
-            if cart_item["item"].get_name() == item.get_name():
-                cart_item["quantity"] += quantity
-                print(f"{quantity} {item.get_name()} added to cart.")
-                return
-
-        # If the item is not in the cart, add it
-        self.cart.append({"item": item, "quantity": quantity})
-        print(f"{quantity} {item.get_name()} added to cart.")
-
-    # Method to remove item
-    def remove_item(self, item_name):
-        for cart_item in self.cart:
-            if cart_item["item"].get_name().lower() == item_name.lower():
-                self.cart.remove(cart_item)
-                print(f"{item_name} removed from the cart.")
-                return
-        print(f"{item_name} is not in the cart.")
-
-    # Method to view cart
-    def view_cart(self):
-        print("\nYour shopping cart:")
-        if not self.cart:
-            print("Your cart is empty.")
-        else:
-            total = 0
-            for cart_item in self.cart:
-                item = cart_item["item"]
-                quantity = cart_item["quantity"]
-                item_total = item.get_price() * quantity
-                total += item_total
-                print(f"{item.get_name()}: Rs {item.get_price():.2f} X {quantity} = Rs {item_total:.2f}")
-            print(f"Total: Rs {total:.2f}")
-
-    # Method to print receipt
-    def print_receipt(self):
-        print("\n------ Receipt ------")
-        if not self.cart:
-            print("Your cart is empty.")
-        else:
-            total = 0
-            for cart_item in self.cart:
-                item = cart_item["item"]
-                quantity = cart_item["quantity"]
-                item_total = item.get_price() * quantity
-                total += item_total
-                print(f"{item.get_name().capitalize()}: Rs {item.get_price():.2f} X {quantity} = Rs {item_total:.2f}")
-            print("-" * 30)
-            print(f"Total: Rs {total:.2f}")
-            print("Thank you for shopping with us!")
+        total = 0
+        print("\n----------- Receipt -----------")
+        for item in self._cart:
+            product = item['product']
+            quantity = item['quantity']
+            cost = product.get_price() * quantity
+            print(f"{product.get_name()} x {quantity}: Rs{cost:.2f}")
+            total += cost
         print("-" * 30)
+        print(f"Total: Rs{total:.2f}")
+        print("-" * 30)
+        print("Thank you for shopping with us!")
+        print("-" * 30)
+        self._cart.clear()
 
 
-# GroceryManagement class to inherit from ShoppingCart
-class GroceryManagement(ShoppingCart):
-    def __init__(self):
-        super().__init__()  # Initialize the ShoppingCart
-        self.items = {
-            "apple": GroceryItem("Apple", 3.00),
-            "milk": GroceryItem("Milk", 173.00)
-        }
-
-    # Method to show options
-    def show_option(self):
-        print("\nGrocery Management System:")
-        print("1. View available items")
-        print("2. Add items to cart")
-        print("3. Remove item from the cart")
-        print("4. View cart")
-        print("5. Print receipt")
-        print("6. Exit")
-
-    # Method to view available items
-   def view_items(self):
-        print("\nAvailable Items:")
-        for item_name, item in self.items.items():
-            print(f"{item.get_name()}: Rs {item.get_price():.2f}")
-
-    # Method to add items to cart
-    def add_items_to_cart(self):
-        item_name = input("Enter the item name to add to cart: ").strip().lower()
-        if item_name in self.items:
-            try:
-                quantity = int(input("Enter the quantity: "))
-                if quantity <= 0:
-                    print("Quantity must be a positive number.")
-                else:
-                    self.add_item(self.items[item_name], quantity)
-            except ValueError:
-                print("Invalid input. Please enter a valid number.")
-        else:
-            print(f"{item_name} is not available.")
-
-    # Method to remove items from cart
-    def remove_item_from_cart(self):
-        item_name = input("Enter the item name to remove from cart: ").strip().lower()
-        self.remove_item(item_name)
-
-    # Method to start the system
-    def start(self):
-        while True:
-            self.show_option()
-            choice = input("Choose an option: ").strip()
-            if choice == "1":
-                self.view_items()
-            elif choice == "2":
-                self.add_items_to_cart()
-            elif choice == "3":
-                self.remove_item_from_cart()
-            elif choice == "4":
-                self.view_cart()
-            elif choice == "5":
-                self.print_receipt()
-            elif choice == "6":
-                print("Thank you for using the supermarket management system.")
-                break
-            else:
-                print("Invalid option. Please try again.")
-
-
-# Main function
+# Main Program
 def main():
-    system = GroceryManagement()
-    system.start()
+    cashier = Cashier()
 
+    while True:
+        print("\n--- Supermarket Cashier System ---")
+        print("1. Display Products")
+        print("2. Add to Cart")
+        print("3. Checkout")
+        print("4. Exit")
+        choice = input("Enter your choice: ").strip()
+
+        if choice == "1":
+            cashier.display_products()
+
+        elif choice == "2":
+            product_id = input("Enter Product ID: ").strip()
+            try:
+                quantity = int(input("Enter Quantity: "))
+                cashier.add_to_cart(product_id, quantity)
+            except ValueError:
+                print("Invalid quantity. Please enter a number.")
+
+        elif choice == "3":
+            cashier.checkout()
+
+        elif choice == "4":
+            print("Exiting the system. Goodbye!")
+            break
+
+        else:
+            print("Invalid choice. Please try again.")
 
 
 main()
+        
+
+
