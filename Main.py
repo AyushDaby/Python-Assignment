@@ -11,20 +11,21 @@ def display_menu():
     return category  # Return the user's choice
 
 def sales_management_menu():
-    print("\n--- Sales Management System ---")
-    print("1. View available items")
-    print("2. Add items to cart")
-    print("3. Remove item from the cart")
-    print("4. View cart")
-    print("5. Print receipt")
-    print("6. Exit")
-
-def product_management_menu():
     print("\n--- Supermarket Cashier System ---")
     print("1. Display Products")
     print("2. Add to Cart")
     print("3. Checkout")
     print("4. Exit")
+    print("-" * 30)
+
+def product_management_menu():
+    print("\n--- Supermarket Product System ---")
+    print("1. Add product")
+    print("2. Update Product")
+    print("3. Delete Product")
+    print("4. Display All Product")
+    print("5. Display All Stock")
+    print("6. Exit")
     print("-" * 30)
 
 def main():
@@ -37,20 +38,20 @@ def main():
             print("-" * 30)
 
             if choice == "1":
-                transaction = Cashier(None, None, None,None)
+                transaction = Cashier()
                 transaction.display_products()
             
             elif choice == "2":
                 product_code = input("Enter Product Code: ")
                 try:
                     quantity = int(input("Enter Quantity: "))
-                    transaction = Cashier(product_code,None,None,quantity)
-                    transaction.add_to_cart()
+                    transaction = Cashier()
+                    transaction.add_to_cart(product_code,quantity)
                 except ValueError:
                     print("Invalid quantity. Please enter a number.")
             
             elif choice == "3":
-                transaction = Cashier(None, None, None, None)
+                transaction = Cashier()
                 transaction.checkout()
             
             elif choice == "4":
