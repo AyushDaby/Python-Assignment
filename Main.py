@@ -51,7 +51,6 @@ def main():
                     print("Invalid quantity. Please enter a number.")
             
             elif choice == "3":
-                transaction = Cashier()
                 transaction.checkout()
             
             elif choice == "4":
