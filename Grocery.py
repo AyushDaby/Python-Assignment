@@ -49,7 +49,7 @@ class StockManager:
 
     # Method to load products from files
     def load_products(self):
-        products = []  # Use a list to store products
+        products = []  # Use a list to store product_id and stock
         
         try:
             # Open stock.txt to read stock data
@@ -58,8 +58,9 @@ class StockManager:
                     product_id, stock = line.strip().split(',')
                     products.append({'product_id': product_id, 'stock': int(stock)})
             
+        
+            product_data = [] #Use a list to store all product details 
             # Open product.txt to read product details
-            product_data = []
             with open(product_file, 'r') as file:
                    for line in file:
                       product_data.append(line.strip().split(','))
@@ -83,13 +84,13 @@ class StockManager:
             return product_objects
 
         except FileNotFoundError:
-            print("Error: Stock or product file not found.")
+            print("Error: Stock or product file not found.")#If the stock file or product file is not found, returns an error
             return []
         except Exception as e:
-            print(f"Error loading products: {e}")
+            print(f"Error loading products: {e}")#If product details fails to display, returns an error
             return []
 
-    # Method to get products
+    # Method to get the list of product
     def get_products(self):
         return self._products
 
@@ -110,8 +111,8 @@ class Cashier(StockManager):
     # Method to add item(s) and quantity to cart
     def add_to_cart(self, product_id, quantity):
         for product in self._products:
-            if product.get_product_id() == product_id:
-                if product.get_stock() >= quantity:
+            if product.get_product_id() == product_id: #if product_id is the same as it is in the product list 
+                if product.get_stock() >= quantity:#if stock available for a product is less than quantity entered
                     product.set_stock(product.get_stock() - quantity)
                     self._cart.append({'product': product, 'quantity': quantity})
                     print(f"Added {quantity} units of {product.get_name()} to cart.")
@@ -128,9 +129,9 @@ class Cashier(StockManager):
 
         total = 0
         print("\n----------- Receipt -----------")#Printing a receipt after checkout 
-        for item in self._cart:
-            product = item['product']
-            quantity = item['quantity']
+        for item in self._cart:#Printing the details of items in the cart 
+            product = item["product"]
+            quantity = item["quantity"]
             cost = product.get_price() * quantity
             print(f"{product.get_name()} x {quantity}: Rs{cost:.2f}")
             total += cost
@@ -154,28 +155,27 @@ def main():
         print("4. Exit")
         choice = input("Enter your choice: ").strip()
         
-        #
+        #Using a case statement to allow user to choose their operation.
         if choice == "1":
-            cashier.display_products()
+            cashier.display_products()#Display the product details available in the supermarket
 
         elif choice == "2":
-            product_id = input("Enter Product ID: ").strip()
+            product_id = input("Enter Product ID: ").strip()#Enter the product ID 
             try:
-                quantity = int(input("Enter Quantity: "))
+                quantity = int(input("Enter Quantity: "))#Enter the Quantity for the product ID Above
                 cashier.add_to_cart(product_id, quantity)
             except ValueError:
-                print("Invalid quantity. Please enter a number.")
+                print("Invalid quantity. Please enter a number.")#If either product ID or Quantity is invalid then display an error message
 
         elif choice == "3":
-            cashier.checkout()
+            cashier.checkout()#Display a receipt all items in the cart
 
         elif choice == "4":
-            print("Exiting the system. Goodbye!")
+            print("Exiting the system. Goodbye!")#If all is done with the above operations, it stops all operations and exit the system 
             break
 
         else:
             print("Invalid choice. Please try again.")
-
 
 
 
