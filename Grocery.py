@@ -24,6 +24,15 @@ class Product:
         return self._stock
 
     # Setters Methods
+    def set_product_id(self, product_id):
+        self._product_id = product_id
+
+    def set_name(self, name):
+        self._name = name
+
+    def set_price(self, price):
+        self._price = price
+
     def set_stock(self, stock):
         self._stock = stock
 
@@ -41,25 +50,26 @@ class StockManager:
     # Method to load products from files
     def load_products(self):
         products = []  # Use a list to store products
-
+        
         try:
             # Open stock.txt to read stock data
             with open(stock_file, 'r') as file:
                 for line in file:
                     product_id, stock = line.strip().split(',')
                     products.append({'product_id': product_id, 'stock': int(stock)})
-
+            
             # Open product.txt to read product details
+            product_data = []
             with open(product_file, 'r') as file:
-                product_data = [line.strip().split(',') for line in file]  # Read all product data
-
+                   for line in file:
+                      product_data.append(line.strip().split(','))
             # Update products list with name and price
             for product in products:
                 for data in product_data:
                     if product['product_id'] == data[0]:  # Match product_id
                         product['name'] = data[1]  # Update name
                         product['price'] = float(data[4])  # Update price
-                        break  # Exit inner loop once the product is found
+                        break  # Exit the loop once the product is found
 
             # Create Product objects
             product_objects = []
@@ -117,7 +127,7 @@ class Cashier(StockManager):
             return
 
         total = 0
-        print("\n----------- Receipt -----------")
+        print("\n----------- Receipt -----------")#Printing a receipt after checkout 
         for item in self._cart:
             product = item['product']
             quantity = item['quantity']
@@ -143,7 +153,8 @@ def main():
         print("3. Checkout")
         print("4. Exit")
         choice = input("Enter your choice: ").strip()
-
+        
+        #
         if choice == "1":
             cashier.display_products()
 
@@ -166,7 +177,5 @@ def main():
             print("Invalid choice. Please try again.")
 
 
-main()
-        
 
 
