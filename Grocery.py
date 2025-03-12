@@ -75,12 +75,7 @@ class StockManager:
             # Create Product objects
             product_objects = []
             for product in products:
-                product_objects.append(Product(
-                    product_id=product['product_id'],
-                    name=product['name'],
-                    price=product['price'],
-                    stock=product['stock']
-                ))
+                product_objects.append(Product(product_id=product['product_id'], name=product['name'], price=product['price'], stock=product['stock']))
             return product_objects
 
         except FileNotFoundError:
@@ -171,11 +166,12 @@ def main():
             cashier.checkout()#Display a receipt all items in the cart
 
         elif choice == "4":
-            print("Exiting the system. Goodbye!")#If all is done with the above operations, it stops all operations and exit the system 
+            print("Return to main menu.")#Return to main menu
             break
 
         else:
             print("Invalid choice. Please try again.")
 
+  
 
 
