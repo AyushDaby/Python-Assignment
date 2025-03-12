@@ -1,9 +1,7 @@
-from Sales import Sales
-
 class Product:
     # Text files to be used
-    products_file = "products.txt"
-    stock_file = "stock.txt"
+    products_file = "Assignment/products.txt"
+    stock_file = "Assignment/stock.txt"
 
     # Constructor Method
     def __init__(self, prod_code, prod_name, prod_description,prod_qty, prod_price,prod_location):
@@ -167,29 +165,41 @@ class Product:
 
     # Method to delete a product from the system
     def delete_product(self, product_id):
-        products = self.read_products()
-        updated_products = []
-        
-        for product in products:
-            if product._prod_code != product_id:  # Use the correct loop variable
-                updated_products.append(product)
-        
-        with open(self.products_file, "w") as outputfile:
-            for product in updated_products:
-                # Write the product details in the correct format
-                outputfile.write(f"{product._prod_code},{product._prod_name},{product._prod_description},{product._prod_qty},{product._prod_price},{product._prod_location}\n")
-        
-        print(f"Product code details {product_id} deleted from system successfully!")
-
-        with open("stock.txt", "r") as stockfile:
-            stock_lines = stockfile.readlines()
-            updated_stock = []
-        
-            for line in stock_lines:
-                if not line.startswith(f"{product_id},"):
-                    updated_stock.append(line)
+       try:
+            products = self.read_products()
+            updated_products = []
             
-            with open("stock.txt", "w") as stockfile:
-                stockfile.writelines(updated_stock)
+            for product in products:
+                if product._prod_code != product_id:  # Use the correct loop variable
+                    updated_products.append(product)
             
-            print(f"Product stock information {product_id} deleted from system successfully!")
+            with open(self.products_file, "w") as outputfile:
+                for product in updated_products:
+                    # Write the product details in the correct format
+                    outputfile.write(f"{product._prod_code},{product._prod_name},{product._prod_description},{product._prod_qty},{product._prod_price},{product._prod_location}\n")
+            
+            print(f"Product code details {product_id} deleted from system successfully!")
+            
+       except FileNotFoundError:
+        print("Error: The stock file 'stock.txt' was not found.")
+       except Exception as e:
+        print(f"An unexpected error occurred: {e}")
+            
+        try:
+            with open("stock.txt", "r") as stockfile:
+                stock_lines = stockfile.readlines()
+                updated_stock = []
+            
+                for line in stock_lines:
+                    if not line.startswith(f"{product_id},"):
+                        updated_stock.append(line)
+                
+                with open("stock.txt", "w") as stockfile:
+                    stockfile.writelines(updated_stock)
+                
+                    print(f"Product stock information {product_id} deleted from system successfully!")
+                
+        except FileNotFoundError:
+          print("Error: The stock file 'stock.txt' was not found.")
+        except Exception as e:
+          print(f"An error occurred while updating the stock file: {e}")
