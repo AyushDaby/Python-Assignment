@@ -45,7 +45,7 @@ class Product:
 class StockManager:
     # Constructor Method
     def __init__(self):
-        self._products = self.load_products()
+        self._products = self.load_products() # load products from files
 
     # Method to load products from files
     def load_products(self):
@@ -53,29 +53,29 @@ class StockManager:
         
         try:
             # Open stock.txt to read stock data
-            with open(stock_file, 'r') as file:
+            with open(stock_file, "r") as file:
                 for line in file:
-                    product_id, stock = line.strip().split(',')
-                    products.append({'product_id': product_id, 'stock': int(stock)})
+                    product_id, stock = line.strip().split(',') # Split each line into product_id and stock
+                    products.append({"product_id": product_id, "stock": int(stock)})
             
         
             product_data = [] #Use a list to store all product details 
             # Open product.txt to read product details
-            with open(product_file, 'r') as file:
+            with open(product_file, "r") as file:
                    for line in file:
                       product_data.append(line.strip().split(','))
             # Update products list with name and price
             for product in products:
                 for data in product_data:
-                    if product['product_id'] == data[0]:  # Match product_id
-                        product['name'] = data[1]  # Update name
-                        product['price'] = float(data[4])  # Update price
+                    if product["product_id"] == data[0]:  # Match product_id
+                        product["name"] = data[1]  # Update name
+                        product["price"] = float(data[4])  # Update price
                         break  # Exit the loop once the product is found
 
             # Create Product objects
             product_objects = []
             for product in products:
-                product_objects.append(Product(product_id=product['product_id'], name=product['name'], price=product['price'], stock=product['stock']))
+                product_objects.append(Product(product_id=product["product_id"], name=product["name"], price=product["price"], stock=product["stock"]))
             return product_objects
 
         except FileNotFoundError:
@@ -108,8 +108,8 @@ class Cashier(StockManager):
         for product in self._products:
             if product.get_product_id() == product_id: #if product_id is the same as it is in the product list 
                 if product.get_stock() >= quantity:#if stock available for a product is less than quantity entered
-                    product.set_stock(product.get_stock() - quantity)
-                    self._cart.append({'product': product, 'quantity': quantity})
+                    product.set_stock(product.get_stock() - quantity)#Removing from stock depending on quantity
+                    self._cart.append({"product": product, "quantity": quantity})
                     print(f"Added {quantity} units of {product.get_name()} to cart.")
                 else:
                     print(f"Not enough stock for {product.get_name()}.")
@@ -136,6 +136,7 @@ class Cashier(StockManager):
         print("Thank you for shopping with us!")
         print("-" * 30)
         self._cart.clear()
+
 
 
 # Main Program
