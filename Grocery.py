@@ -94,7 +94,7 @@ class StockManager:
         print("\nAvailable Products:")
         for product in self._products:
             print(product)
-
+     
 
 # Creating Subclass Cashier that inherits from Superclass(StockManager)
 class Cashier(StockManager):
@@ -102,77 +102,63 @@ class Cashier(StockManager):
     def __init__(self):
         super().__init__()
         self._cart = []
-
-    # Method to add item(s) and quantity to cart
+ 
+ # Method to add item(s) and quantity to cart
     def add_to_cart(self, product_id, quantity):
+        try:
+            quantity = int(quantity)  # Ensure quantity is an integer
+            if quantity <= 0:
+                print("Quantity must be a positive integer.")
+                return
+        except ValueError:
+            print("Invalid quantity. Please enter a valid number.")
+            return
+
+        product_found = False  # Using a Flag to check if the product is found
         for product in self._products:
-            if product.get_product_id() == product_id: #if product_id is the same as it is in the product list 
-                if product.get_stock() >= quantity:#if stock available for a product is less than quantity entered
-                    product.set_stock(product.get_stock() - quantity)#Removing from stock depending on quantity
-                    self._cart.append({"product": product, "quantity": quantity})
+            if product.get_product_id() == product_id:  # Check if product_id matches
+                product_found = True  # Set the flag to True since the product is found
+                if product.get_stock() >= quantity:  # Check if enough stock is available
+                    # Check if the product is already in the cart
+                    cart_item_found = False
+                    for item in self._cart:
+                        if item["product"].get_product_id() == product_id:
+                            # Update the quantity if the product is already in the cart
+                            item["quantity"] += quantity
+                            cart_item_found = True
+                            break
+
+                    if not cart_item_found:
+                        # Add the product to the cart if it's not already there
+                        self._cart.append({"product": product, "quantity": quantity})
+
+                    product.set_stock(product.get_stock() - quantity)  # Reduce stock by the quantity
                     print(f"Added {quantity} units of {product.get_name()} to cart.")
                 else:
                     print(f"Not enough stock for {product.get_name()}.")
-                return
-        print("Product not found.")
+                break  # Exit the loop once the product is found and processed
+        if not product_found:  # If the product was not found in the loop
+            print("Product not found.")
 
     # Method to checkout and display a receipt
     def checkout(self):
-        if not self._cart:
+        if not self._cart:  # Check if the cart is empty
             print("Your cart is empty. Add products before checking out.")
             return
 
         total = 0
-        print("\n----------- Receipt -----------")#Printing a receipt after checkout 
-        for item in self._cart:#Printing the details of items in the cart 
+        print("\n----------- Receipt -----------")  # Print receipt header
+        for item in self._cart:  # Iterate through items in the cart
             product = item["product"]
             quantity = item["quantity"]
-            cost = product.get_price() * quantity
-            print(f"{product.get_name()} x {quantity}: Rs{cost:.2f}")
-            total += cost
+            cost = product.get_price() * quantity  # Calculate cost for the item
+            print(f"{product.get_name()} x {quantity}: Rs{cost:.2f}")  # Print item details
+            total += cost  # Add to total cost
         print("-" * 30)
-        print(f"Total: Rs{total:.2f}")
+        print(f"Total: Rs{total:.2f}")  # Print total cost
         print("-" * 30)
-        print("Thank you for shopping with us!")
+        print("Thank you for shopping with us!")  # Print thank you message
         print("-" * 30)
-        self._cart.clear()
-
-
-
-# Main Program
-def main():
-    cashier = Cashier()
-
-    while True:
-        print("\n--- Supermarket Cashier System ---")
-        print("1. Display Products")
-        print("2. Add to Cart")
-        print("3. Checkout")
-        print("4. Exit")
-        choice = input("Enter your choice: ").strip()
-        
-        #Using a case statement to allow user to choose their operation.
-        if choice == "1":
-            cashier.display_products()#Display the product details available in the supermarket
-
-        elif choice == "2":
-            product_id = input("Enter Product ID: ").strip()#Enter the product ID 
-            try:
-                quantity = int(input("Enter Quantity: "))#Enter the Quantity for the product ID Above
-                cashier.add_to_cart(product_id, quantity)
-            except ValueError:
-                print("Invalid quantity. Please enter a number.")#If either product ID or Quantity is invalid then display an error message
-
-        elif choice == "3":
-            cashier.checkout()#Display a receipt all items in the cart
-
-        elif choice == "4":
-            print("Return to main menu.")#Return to main menu
-            break
-
-        else:
-            print("Invalid choice. Please try again.")
-
-  
-
+   
+        self._cart.clear()  # Clear the cart after checkout
 
