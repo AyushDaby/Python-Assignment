@@ -1,8 +1,9 @@
-stock_file = "Assignment/stock.txt"
-product_file = "Assignment/products.txt"
+stock_file = "stock.txt"
+product_file = "products.txt"
 
 # Creating Superclass Product
-class Product:
+class ProductManager:
+    
     # Constructor Method
     def __init__(self, product_id, name, price, stock):
         self._product_id = product_id
@@ -39,7 +40,21 @@ class Product:
     # Creating an str method to display the details of a Product object
     def __str__(self):
         return f"{self._product_id}: {self._name} (Price: Rs{self._price:.2f}, Stock: {self._stock})"
-
+    
+    def check_product_code(self):
+        try:
+            with open(product_file, "r") as checkfile:
+                for line in checkfile:
+                    existing_product_id = line.strip().split(',')[0]
+                    if existing_product_id == self._product_id:
+                        return True
+            return False
+        except FileNotFoundError:
+            print("Error: Products file not found.")
+            return False
+        except Exception as e:
+            print(f"An error occurred while checking the product code: {e}")
+            return False
 
 # Creating Superclass StockManager
 class StockManager:
@@ -75,7 +90,7 @@ class StockManager:
             # Create Product objects
             product_objects = []
             for product in products:
-                product_objects.append(Product(product_id=product["product_id"], name=product["name"], price=product["price"], stock=product["stock"]))
+                product_objects.append(ProductManager(product_id=product["product_id"], name=product["name"], price=product["price"], stock=product["stock"]))
             return product_objects
 
         except FileNotFoundError:
@@ -85,10 +100,12 @@ class StockManager:
             print(f"Error loading products: {e}")#If product details fails to display, returns an error
             return []
 
+
     # Method to get the list of product
     def get_products(self):
         return self._products
 
+    
     # Method to display product
     def display_products(self):
         print("\nAvailable Products:")
@@ -161,4 +178,3 @@ class Cashier(StockManager):
         print("-" * 30)
    
         self._cart.clear()  # Clear the cart after checkout
-
