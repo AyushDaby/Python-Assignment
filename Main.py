@@ -1,11 +1,12 @@
 from Product import Product
-from Grocery import Cashier
+from Grocery import Cashier, ProductManager
 
 # Function to display the main menu and get the user's choice
 def display_menu():
     print("\n--- Cashier Management System ---")
     print("1. Sales transactions and recording")
     print("2. Product and stock management")
+    print("3. Close")
     print("-" * 30)
     category = input("Enter the field of operation: ")
     print("-" * 30)
@@ -48,20 +49,25 @@ def main():
                 elif choice == "2":  # Add a product to the cart
                     while True:
                         product_code = input("Enter Product Code: ")
-                        try:
-                            quantity = int(input("Enter Quantity: "))  # Get the quantity from the user
-                            if quantity <= 0:
-                                print("Quantity must be a positive integer.")
-                                continue
-                            transaction.add_to_cart(product_code, quantity)  # Add the product to the cart
-                            
-                        except ValueError:  # Handle invalid quantity
-                            print("Invalid quantity. Please enter a number.")
-                            continue
+                        check_code = ProductManager(product_code, None, None, None)
 
-                        continue_more = input("Do you want to add more (yes/no): ")
-                        if continue_more.lower() == "no":
-                            break
+                        if not check_code.check_product_code():
+                            print(f"Error: Product code '{product_code}' does not exist in the system.")
+                        else:
+                            try:
+                                quantity = int(input("Enter Quantity: "))  # Get the quantity from the user
+                                if quantity <= 0:
+                                    print("Quantity must be a positive integer.")
+                                    continue
+                                transaction.add_to_cart(product_code, quantity)  # Add the product to the cart
+                                
+                            except ValueError:  # Handle invalid quantity
+                                print("Invalid quantity. Please enter a number.")
+                                continue
+
+                            continue_more = input("Do you want to add more (yes/no): ")
+                            if continue_more.lower() == "no":
+                                break
 
                 elif choice == "3":  # Proceed to checkout
                     transaction.checkout()
@@ -136,8 +142,13 @@ def main():
 
                 elif choice == "3":  # Delete Product
                     product_code = input("Enter product code to delete: ")
-                    product = Product(None, None, None, None, None, None)  # Create a dummy product to access methods
-                    product.delete_product(product_code)
+                    check_code = Product(product_code, None, None, None, None, None)
+
+                    if not check_code.check_product_code() :
+                        print(f"Error: Product code '{product_code} does not exist in the system.")
+                    else:
+                        product = Product(None, None, None, None, None, None)  # Create a dummy product to access methods
+                        product.delete_product(product_code)
 
                 elif choice == "4":  # Display All Products
                     product = Product(None, None, None, None, None, None)  # Create a dummy product to access methods
@@ -160,6 +171,8 @@ def main():
                 else:
                     print("Invalid choice. Please try again.")
 
+        elif category == "3":
+            print(f"Application closed! Goodbye!")
         else:
             print("Invalid choice. Please try again.")
 
