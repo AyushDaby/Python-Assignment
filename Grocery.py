@@ -1,9 +1,8 @@
-stock_file = "stock.txt"
-product_file = "products.txt"
+stock_file = "Assignment/stock.txt"
+product_file = "Assignment/products.txt"
 
 # Creating Superclass Product
 class ProductManager:
-    
     # Constructor Method
     def __init__(self, product_id, name, price, stock):
         self._product_id = product_id
@@ -41,12 +40,13 @@ class ProductManager:
     def __str__(self):
         return f"{self._product_id}: {self._name} (Price: Rs{self._price:.2f}, Stock: {self._stock})"
     
+    #Method to check product code
     def check_product_code(self):
         try:
-            with open(product_file, "r") as checkfile:
+            with open(product_file, "r") as checkfile: # Open product.txt to read product details
                 for line in checkfile:
                     existing_product_id = line.strip().split(',')[0]
-                    if existing_product_id == self._product_id:
+                    if existing_product_id == self._product_id:# If Product code exist in the file returns true
                         return True
             return False
         except FileNotFoundError:
@@ -55,6 +55,7 @@ class ProductManager:
         except Exception as e:
             print(f"An error occurred while checking the product code: {e}")
             return False
+
 
 # Creating Superclass StockManager
 class StockManager:
@@ -99,13 +100,13 @@ class StockManager:
         except Exception as e:
             print(f"Error loading products: {e}")#If product details fails to display, returns an error
             return []
-
-
+      
+    
+      
     # Method to get the list of product
     def get_products(self):
         return self._products
 
-    
     # Method to display product
     def display_products(self):
         print("\nAvailable Products:")
@@ -119,6 +120,7 @@ class Cashier(StockManager):
     def __init__(self):
         super().__init__()
         self._cart = []
+
  
  # Method to add item(s) and quantity to cart
     def add_to_cart(self, product_id, quantity):
@@ -156,6 +158,20 @@ class Cashier(StockManager):
                 break  # Exit the loop once the product is found and processed
         if not product_found:  # If the product was not found in the loop
             print("Product not found.")
+            
+            
+    # Method to remove a product completely from the cart
+    def remove_from_cart(self, product_id):
+        for item in self._cart:
+            if item["product"].get_product_id() == product_id:  # Check if product_id matches
+                # Restore the stock
+                item["product"].set_stock(item["product"].get_stock() + item["quantity"])
+                # Remove the product from the cart
+                self._cart.remove(item)
+                print(f"{item['product'].get_name()} has been completely removed from the cart.")
+                return
+        print(f"Product with code '{product_id}' not found in the cart.")
+        
 
     # Method to checkout and display a receipt
     def checkout(self):
