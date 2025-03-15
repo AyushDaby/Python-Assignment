@@ -1,4 +1,4 @@
-from Product import Product
+rom Product import Product
 from Grocery import Cashier, ProductManager
 
 # Function to display the main menu and get the user's choice
@@ -6,7 +6,6 @@ def display_menu():
     print("\n--- Cashier Management System ---")
     print("1. Sales transactions and recording")
     print("2. Product and stock management")
-    print("3. Close")
     print("-" * 30)
     category = input("Enter the field of operation: ")
     print("-" * 30)
@@ -16,9 +15,10 @@ def display_menu():
 def sales_management_menu():
     print("\n--- Supermarket Cashier System ---")
     print("1. Display Products")
-    print("2. Add to Cart")
-    print("3. Checkout")
-    print("4. Exit")
+    print("2. Add To Cart")
+    print("3. Remove From Cart")
+    print("4. Checkout")
+    print("5. Exit")
     print("-" * 30)
 
 # Function to display the product management menu
@@ -54,6 +54,7 @@ def main():
                         if not check_code.check_product_code():
                             print(f"Error: Product code '{product_code}' does not exist in the system.")
                         else:
+
                             try:
                                 quantity = int(input("Enter Quantity: "))  # Get the quantity from the user
                                 if quantity <= 0:
@@ -64,15 +65,20 @@ def main():
                             except ValueError:  # Handle invalid quantity
                                 print("Invalid quantity. Please enter a number.")
                                 continue
-
+                            #If user wants to add more products
                             continue_more = input("Do you want to add more (yes/no): ")
                             if continue_more.lower() == "no":
                                 break
+                            
+                elif choice == "3":  # Remove a product from the cart
+                   product_code = input("Enter Product Code to remove: ")
+                   transaction.remove_from_cart(product_code)
 
-                elif choice == "3":  # Proceed to checkout
+
+                elif choice == "4":  # Proceed to checkout
                     transaction.checkout()
-
-                elif choice == "4":  # Exit to the main menu
+                    
+                elif choice == "5":  # Exit to the main menu
                     print("Return to main menu.")
                     break
 
@@ -141,14 +147,12 @@ def main():
                         print("-" * 30)
 
                 elif choice == "3":  # Delete Product
-                    product_code = input("Enter product code to delete: ")
-                    check_code = Product(product_code, None, None, None, None, None)
-
-                    if not check_code.check_product_code() :
+                     product_code = input("Enter product code to delete: ")
+                     check_code = Product(product_code, None, None, None, None, None)
+                     if not check_code.check_product_code():
                         print(f"Error: Product code '{product_code} does not exist in the system.")
-                    else:
-                        product = Product(None, None, None, None, None, None)  # Create a dummy product to access methods
-                        product.delete_product(product_code)
+                     else:
+                        product = Product(None, None, None, None, None, None)  # Create a dummy product to access method
 
                 elif choice == "4":  # Display All Products
                     product = Product(None, None, None, None, None, None)  # Create a dummy product to access methods
@@ -171,8 +175,6 @@ def main():
                 else:
                     print("Invalid choice. Please try again.")
 
-        elif category == "3":
-            print(f"Application closed! Goodbye!")
         else:
             print("Invalid choice. Please try again.")
 
