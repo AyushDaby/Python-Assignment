@@ -1,7 +1,7 @@
-class Product:
+cclass Product:
     # Text files to be used
-    products_file = "products.txt"
-    stock_file = "stock.txt"
+    products_file = "Assignment/products.txt"
+    stock_file = "Assignment/stock.txt"
 
     # Constructor Method
     def __init__(self, prod_code, prod_name, prod_description,prod_qty, prod_price,prod_location):
@@ -20,7 +20,7 @@ class Product:
         return self._prod_name
     
     def get_prod_description(self):
-        return self._prod_description
+        return self._prod_description  
     
     def get_prod_qty(self):
         return self._prod_qty
@@ -61,14 +61,28 @@ class Product:
     def display_stock(self):
         print(f"Product Code: {self._prod_code}")
         print(f"Quantity in stock: {self._prod_qty}")
-
+        
+        
+    
+    #Method to check product code
     def check_product_code(self):
-        with open(self.products_file,"r") as checkfile:
+        with open(self.products_file,"r") as checkfile: # Open product.txt to read product details
             for line in checkfile:
                 existing_prod_code = line.split(",")[0]
-                if existing_prod_code == self._prod_code:
+                if existing_prod_code == self._prod_code:# If Product code exist in the file returns true
                     return True
             return False
+        
+    #Method to check that product code starts with "GR***" when adding a product
+    def check_start_product_code(product_code):
+        if len(product_code) != 5:
+            return False
+        if not product_code.startswith("GR"):
+            return False
+        for char in product_code[2:]:
+            if not char.isdigit():
+                return False
+        return True
 
     # Method to read the content of the file and store is in a list
     def read_products(self):
@@ -90,7 +104,7 @@ class Product:
             with open(self.stock_file, "r") as inputfile:
                 for line in inputfile:
                     fields = line.strip().split(",")
-                    stock.append(Product(fields[0],None,None,fields[1], None, None))
+                    stock.append(Product(fields[0], None, None, fields[1], None, None))
         except FileNotFoundError:
             print("Stock file not found. Creating a new one.")
         return stock
@@ -102,7 +116,15 @@ class Product:
 
         print(f"Product '{self._prod_name}' added successfully!")
         self.update_stock(self._prod_code, self._prod_qty)
+    #Method to check whether there is the same product code in the product.txt
+    def check_product_code(self):
+        with open(self.products_file,"r") as checkfile:
+            for line in checkfile:
+                existing_prod_code = line.split(",")[0]
 
+                if existing_prod_code == self._prod_code:
+                    return True
+            return False 
     # Method to update a product's information
     def update_product(self,product_code, category, updated_value):
         products = self.read_products()
@@ -173,7 +195,7 @@ class Product:
 
     # Method to delete a product from the system
     def delete_product(self, product_id):
-        try:
+       try:
             products = self.read_products()
             updated_products = []
             
@@ -188,6 +210,12 @@ class Product:
             
             print(f"Product code details {product_id} deleted from system successfully!")
             
+       except FileNotFoundError:
+        print("Error: The stock file 'stock.txt' was not found.")
+       except Exception as e:
+        print(f"An unexpected error occurred: {e}")
+            
+        try:
             with open("stock.txt", "r") as stockfile:
                 stock_lines = stockfile.readlines()
                 updated_stock = []
@@ -199,14 +227,11 @@ class Product:
                 with open("stock.txt", "w") as stockfile:
                     stockfile.writelines(updated_stock)
                 
-                    print(f"Product stock information {product_id} deleted from the stock successfully!")  
-                       
-        except FileNotFoundError:
-            print("Error: The stock file 'stock.txt' was not found.")
-        except Exception as e:
-            print(f"An unexpected error occurred: {e}")
-                   
+                    print(f"Product stock information {product_id} deleted from system successfully!")
+                
         except FileNotFoundError:
           print("Error: The stock file 'stock.txt' was not found.")
         except Exception as e:
           print(f"An error occurred while updating the stock file: {e}")
+    
+            
