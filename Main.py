@@ -1,4 +1,4 @@
-rom Product import Product
+from Product import Product
 from Grocery import Cashier, ProductManager
 
 # Function to display the main menu and get the user's choice
@@ -92,20 +92,24 @@ def main():
                 print("-" * 30)
 
                 if choice == "1":  # Add Product
-                    code = input("Enter product code: ")
-                    check_code = Product(code, None, None, None, None, None)  # Create a dummy product to check if the code exists
+                        code = input("Enter product code: ")
+                        check_code = Product(code.upper(), None, None, None, None, None)  # Create a dummy product to check if the code exists
 
-                    if check_code.check_product_code():  # Check if the product code already exists
-                        print(f"Error: Product code '{code}' already exists in the system.")
-                    else:
-                        name = input("Enter product name: ")
-                        description = input("Enter product description: ")
-                        qty = int(input("Enter product quantity: "))
-                        price = float(input("Enter product price: "))
-                        location = input("Enter product location: ")
+                        if not Product.check_start_product_code(code.upper()):# Check if product code is invalid 
+                            print(f"Error: Product code '{code}' is invalid. It must start with 'GR' and be followd by 3 digits.")
+                        
+                        else:
+                            if check_code.check_product_code():  # Check if the product code already exists
+                                print(f"Error: Product code '{code}' already exists in the system.")
+                            else:
+                                name = input("Enter product name: ")
+                                description = input("Enter product description: ")
+                                qty = int(input("Enter product quantity: "))
+                                price = float(input("Enter product price: "))
+                                location = input("Enter product location: ")
 
-                        product = Product(code, name, description, qty, price, location)
-                        product.add_product()  # Add the product to the system
+                                product = Product(code, name, description, qty, price, location)
+                                product.add_product()  # Add the product to the system
 
                 elif choice == "2":  # Update Product
                     while True:
