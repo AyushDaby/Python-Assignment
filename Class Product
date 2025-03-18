@@ -90,8 +90,6 @@ cclass Product:
         try:
             with open(self.products_file, "r") as inputfile:
                 for line in inputfile:
-                    # prod_code, prod_name, prod_description, prod_qty, prod_price, prod_location = line.strip().split(",")
-                    # products.append(Product(prod_code, prod_name, prod_description, int(prod_qty), float(prod_price), prod_location))
                     fields = line.strip().split(",")
                     products.append(Product(fields[0], fields[1], fields[2], fields[3], fields[4], fields[5]))
         except FileNotFoundError:
